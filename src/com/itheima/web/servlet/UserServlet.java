@@ -1,5 +1,6 @@
 package com.itheima.web.servlet;
 
+import com.itheima.constant.Constant;
 import com.itheima.domain.User;
 import com.itheima.myconverter.MyConverter;
 import com.itheima.service.UserService;
@@ -78,15 +79,70 @@ public class UserServlet extends BaseServlet {
         User user = s.active(code);
         //通过激活码没有找到用户
         if(user == null){
-            System.out.println("active 用户不存在");
             request.setAttribute("msg", "请重新激活");
         }else {
-            System.out.println("active 用户存在");
             //添加信息
             request.setAttribute("msg", "激活成功");
         }
         //3、请求转发到msg.jsp
         return "/jsp/msg.jsp";
+    }
+
+    /**
+     * 跳转到登陆页面
+     * @param request
+     * @param response
+     * @return
+     * @throws ServletException
+     * @throws IOException
+     */
+    public String loginUI(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        return "/jsp/login.jsp";
+    }
+
+    /**
+     * 登录
+     * @param request
+     * @param response
+     * @return
+     * @throws ServletException
+     * @throws IOException
+     */
+    public String login(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        //1、获取用户名和密码
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
+        password = MD5Utils.md5(password);//密码需要加密再查找
+        //2、调用service完成登陆操作，返回user
+        UserService s = new UserServiceImpl();
+        User user = s.login(username, password);
+        //3、判断用户
+        if(user == null){
+            //用户名和密码不匹配
+            request.setAttribute("msg", "用户名和密码不匹配");
+            return "/jsp/login.jsp";
+        }else {
+            //继续判断用户是否激活
+            if(Constant.USER_ACTIVE != user.getState()){
+                request.setAttribute("msg", "用户未激活");
+                return "/jsp/login.jsp";
+            }
+        }
+        //4、将用户放入session域中，重定向到首页
+        request.getSession().setAttribute("user", user);
+        response.sendRedirect(request.getContextPath() + "/");//  /store
+
+        return null;
+    }
+
+    public String logout(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        //干掉session
+        request.getSession().invalidate();
+        //重定向
+        response.sendRedirect(request.getContextPath());
+        //处理自动登录
+
+        return null;
     }
 
 }

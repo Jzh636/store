@@ -56,7 +56,21 @@ public class UserDaoImpl implements UserDao {
     @Override
     public void update(User user) throws Exception {
         QueryRunner qr = new QueryRunner(DataSourceUtils.getDataSource());
-        String sql = "update user set username = ?, password = ?, name = ?, email = ?,telephone = ?, birthday = ?, sex = ?, state = ?, code = ?, where uid = ?";
+        String sql = "update user set username = ?, password = ?, name = ?, email = ?,telephone = ?, birthday = ?, sex = ?, state = ?, code = ? where uid = ?";
         qr.update(sql, user.getUsername(), user.getPassword(), user.getName(), user.getEmail(), user.getTelephone(), user.getBirthday(), user.getSex(), user.getState(), null, user.getUid());
     }
+
+    /**
+     * 用户登录
+     * @param username
+     * @param password
+     * @return
+     */
+    @Override
+    public User getByUsernameAndPassword(String username, String password) throws Exception {
+        QueryRunner qr = new QueryRunner(DataSourceUtils.getDataSource());
+        String sql = "select * from user where username = ? and password = ? limit 1";
+        return qr.query(sql, new BeanHandler<>(User.class), username, password);
+    }
+
 }

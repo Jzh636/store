@@ -31,7 +31,6 @@ public class UserServiceImpl implements UserService {
         UserDao dao = new UserDaoImpl();
         //1、通过code获取一个用户
         User user = dao.getByCode(code);
-        System.out.println("用户名" + user.getUsername());
         //2、判断用户是否为空
         if(user == null){
             return null;
@@ -41,5 +40,18 @@ public class UserServiceImpl implements UserService {
         user.setState(1);
         dao.update(user);
         return user;
+    }
+
+    /**
+     * 用户登录
+     * @param username
+     * @param password
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public User login(String username, String password) throws Exception {
+        UserDao dao = new UserDaoImpl();
+        return dao.getByUsernameAndPassword(username, password);
     }
 }

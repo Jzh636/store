@@ -23,13 +23,10 @@ public class BaseServlet extends HttpServlet {
             if(m == null){
                 m = "index";
             }
-            System.out.println(m);
             //3、获取方法对象
             Method method = clazz.getMethod(m, HttpServletRequest.class, HttpServletResponse.class);
-            System.out.println(method.equals(null) + "===============================");
             //4、方法执行,返回值是请求转发的路径
             String s = (String) method.invoke(clazz.newInstance(), request, response);
-            System.out.println("service 路径为空");
             //5、判断s是否为空
             if(s != null){
                 request.getRequestDispatcher(s).forward(request, response);
